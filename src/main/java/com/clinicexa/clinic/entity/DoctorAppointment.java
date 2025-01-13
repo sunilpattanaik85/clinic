@@ -2,11 +2,7 @@ package com.clinicexa.clinic.entity;
 
 import java.util.Date;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -23,6 +19,17 @@ public class DoctorAppointment {
 	private String patientPhone; 
 	private Date dateOfAppointment; 
 	private String patientStatus;
+	@Transient
+	private String strDateOfAppointment;
+
+	public String getStrDateOfAppointment() {
+		return strDateOfAppointment;
+	}
+
+	public void setStrDateOfAppointment(String strDateOfAppointment) {
+		this.strDateOfAppointment = strDateOfAppointment;
+	}
+
 	@JsonCreator
 	public DoctorAppointment(@JsonProperty("doctorId") Long doctorId,@JsonProperty("patientName") String patientName,@JsonProperty("patientPhone") String patientPhone,@JsonProperty("dateOfAppointment") Date dateOfAppointment,
 			@JsonProperty("patientStatus") String patientStatus) {

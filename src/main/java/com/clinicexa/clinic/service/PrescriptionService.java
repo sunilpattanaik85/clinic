@@ -25,7 +25,9 @@ public class PrescriptionService {
 	public Optional<Prescription> findById(Long id) {
 		return prescriptionRepository.findById(id);
 	}
-	
+	public Optional<Prescription> findByDoctorAppointmentId(Long doctorAppointmentId) {
+		return prescriptionRepository.findByDoctorAppointmentId(doctorAppointmentId);
+	}
 	public List<Prescription> findAll(){
 		return prescriptionRepository.findAll();
 	}

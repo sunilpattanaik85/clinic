@@ -29,7 +29,7 @@
         </button>
     </div>
     <div class="my-1.5">
-        <form method="post" th:action="@{/clinic/save}">
+        <form id="form" method="post" th:action="@{/clinic/save}">
         <div class="form-group blu-margin">
             <table class="table table-hover table-responsive-xl">
                 <thead class="thead-light">
@@ -86,51 +86,115 @@
         </div>
         </form>
     </div>
+    <div class="form-group blu-margin" id="dynamicTable">
+    </div>
 </div>
 
 <div th:replace="fragments/footer :: footer"></div>
 
 <script type="text/javascript">
     $('document').ready(function () {
-    $('#btnSave').on('click',function () {
-        //var doctorId = document.getElementByName("doctorId");
-        alert(#doctorId.value)
+    $('#form').submit(function (e) {
+        var doctorId = $('#doctorId').val()
+        if(doctorId == 0){
+            alert('Data Incomplete.Please provide the correct data to proceed.')
+            e.preventDefault();
+        }
+        var doctorId = $('#doctorAppId').val()
+        if(doctorAppId == 0){
+            alert('Data Incomplete.Please provide the correct data to proceed.')
+            e.preventDefault();
+        }
+        var diseaseId = $('#diseaseId').val()
+        if(diseaseId == 0){
+            alert('Data Incomplete.Please provide the correct data to proceed.')
+            e.preventDefault();
+        }
+        var medicineId = $('#medicineId').val()
+        if(medicineId == 0){
+            alert('Data Incomplete.Please provide the correct data to proceed.')
+            e.preventDefault();
+        }
+        var prescriptionId = $('#prescriptionId').val()
+        if(prescriptionId == ''){
+            alert('Data Incomplete.Please provide the correct data to proceed.')
+            e.preventDefault();
+        }
     })
 })
-    $('document').ready(function () { // Line 1
-    $('#doctorId').on('change',function () { // Line 2
-        $('#doctorAppId').empty().append('<option value="0">-Select Patience-</option>'); // Line 3
-        var doctorId = $(this).val(); //Line 4
-        var href = "http://localhost:8077/doctorAppointment/getByDoctor/" + doctorId //Line 5
-        $.get(href, function (list, status) { // Line 6
-            //var doctorAppointments = country.states; // Line 7
-            for (var i = 0; i <= list.length-1; i++) { // Line 8
-                $('#doctorAppId').append('<option value="' + list[i].doctorAppointmentId + '">' + list[i].patientName + '</option>'); // Line 9
+    $('document').ready(function () {
+    $('#doctorId').on('change',function () {
+        $('#doctorAppId').empty().append('<option value="0">-Select Patience-</option>');
+        var doctorId = $(this).val();
+        $('#patientPhone').val("");
+        $('#dateOfAppointMent').val("");
+        $("#dynamicTable").empty().html('');
+        var href = "http://localhost:8077/doctorAppointment/getByDoctor/" + doctorId
+       var href2 = "http://localhost:8077/doctorAppointment/fetchAllDA/" + doctorId
+        $.get(href, function (list, status) {
+            for (var i = 0; i <= list.length-1; i++) {
+                $('#doctorAppId').append('<option value="' + list[i].doctorAppointmentId + '">' + list[i].patientName + '</option>');
             }
         })
-    })
-})
-$('document').ready(function () { // Line 1
-    $('#doctorAppId').on('change',function () { // Line 2
-        var doctorAppId = $(this).val(); //Line 4
-        alert(doctorAppId)
-        var href = "http://localhost:8077/doctorAppointment/" + doctorAppId //Line 5
-        $.get(href, function (doctorAppointmentDtl, status) { // Line 6
-        alert(doctorAppointmentDtl.patientPhone)
-            $('#patientPhone').val(doctorAppointmentDtl.patientPhone);
-            $('#dateOfAppointMent').val(doctorAppointmentDtl.dateOfAppointment);
+        $.get(href2, function (list2, status2) {
+            $("#dynamicTable").append("<table class="+"table table-hover table-responsive-xl"+">");
+                   $("#dynamicTable").append("<thead class="+"thead-light"+">");
+                   $("#dynamicTable").append("<tr>");
+                   $("#dynamicTable").append("<th scope="+"col"+">SlNo</th>");
+                   $("#dynamicTable").append("<th scope="+"col"+">Date</th>");
+                   $("#dynamicTable").append("<th scope="+"col"+">Doctor</th>");
+                   $("#dynamicTable").append("<th scope="+"col"+">Patient</th>");
+                   $("#dynamicTable").append("<th scope="+"col"+">Disease</th>");
+                   $("#dynamicTable").append("<th scope="+"col"+">Medicine</th>");
+                   $("#dynamicTable").append("<th scope="+"col"+">Status</th>");
+                   $("#dynamicTable").append("<th scope="+"col"+"></th>");
+                   $("#dynamicTable").append("</tr>");
+
+                   var j = 0 ;
+            for (var i = 0; i <= list2.length-1; i++) {
+                 j = i+1;
+                 var href3 = "http://localhost:8077/doctorAppointment/gereratePDF/" + list2[i].doctorAppointmentId;
+                 $("#dynamicTable").append("<tr>");
+                 $("#dynamicTable").append("<td>"+j+"</td>");
+                 $("#dynamicTable").append("<td>"+list2[i].strDateOfAppointment+"</td>");
+                 $("#dynamicTable").append("<td>"+list2[i].doctorName+"</td>");
+                 $("#dynamicTable").append("<td>"+list2[i].patientName+"</td>");
+                 $("#dynamicTable").append("<td>"+list2[i].diseaseName+"</td>");
+                 $("#dynamicTable").append("<td>"+list2[i].medicineName+"</td>");
+                 $("#dynamicTable").append("<td>"+list2[i].appointmentStatus+"</td>");
+                 if(list2[i].appointmentStatus  == 'Prescribed')
+                 {
+                    $("#dynamicTable").append("<td><a href="+href3+">Download Prescription</a></td>");
+                 }
+                 else{
+                    $("#dynamicTable").append("<td></td>");
+                 }
+                  $("#dynamicTable").append("</tr>");
+           }
+            $("#dynamicTable").append("</thead>");
+            $("#dynamicTable").append("</table>");
         })
     })
 })
-$('document').ready(function () { // Line 1
-    $('#diseaseId').on('change',function () { // Line 2
-        $('#medicineId').empty().append('<option value="0">-Select Medicine-</option>'); // Line 3
-        var diseaseId = $(this).val(); //Line 4
-        var href = "http://localhost:8077/medicineMaster/getByDisease/" + diseaseId //Line 5
-        $.get(href, function (list, status) { // Line 6
-            //var doctorAppointments = country.states; // Line 7
-            for (var i = 0; i <= list.length-1; i++) { // Line 8
-                $('#medicineId').append('<option value="' + list[i].medicineId + '">' + list[i].medicineName + '</option>'); // Line 9
+$('document').ready(function () {
+    $('#doctorAppId').on('change',function () {
+        var doctorAppId = $(this).val();
+        var href = "http://localhost:8077/doctorAppointment/" + doctorAppId
+        $.get(href, function (doctorAppointmentDtl, status) {
+            $('#patientPhone').val(doctorAppointmentDtl.patientPhone);
+            $('#dateOfAppointMent').val(doctorAppointmentDtl.strDateOfAppointment);
+        })
+    })
+})
+$('document').ready(function () {
+    $('#diseaseId').on('change',function () {
+        $('#medicineId').empty().append('<option value="0">-Select Medicine-</option>');
+        var diseaseId = $(this).val();
+        var href = "http://localhost:8077/medicineMaster/getByDisease/" + diseaseId
+        $.get(href, function (list, status) {
+            //var doctorAppointments = country.states;
+            for (var i = 0; i <= list.length-1; i++) {
+                $('#medicineId').append('<option value="' + list[i].medicineId + '">' + list[i].medicineName + '</option>');
             }
         })
     })

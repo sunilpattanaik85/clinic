@@ -42,7 +42,7 @@ public class PrescriptionController {
 	}
 	
 	@GetMapping("/{id}")
-    public ResponseEntity<Prescription> getDoctorById(@PathVariable long id) {
+    public ResponseEntity<Prescription> findById(@PathVariable long id) {
         Optional<Prescription> prescription = prescriptionService.findById(id);
         
         if (prescription.isPresent()) {
